@@ -12,48 +12,45 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 let map, mapEvent;
-navigator.geolocation.getCurrentPosition(
-  function (position) {
+
+class App {
+  #map;
+  #mapEvent;
+  constructor() {
+    this._getPosition();
+  }
+  _getPosition() {
+    navigator.geolocation.getCurrentPosition(
+      this._loadMap.bind(this),
+
+      function () {
+        alert('could not getyour position');
+      }
+    );
+  }
+  _loadMap(position) {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
     // console.log(latitude);
-    map = L.map('map').setView([latitude, longitude], 13);
+    this.#map = L.map('map').setView([latitude, longitude], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    }).addTo(this.#map);
 
-    // L.marker([latitude, longitude])
-    //   .addTo(map)
-    //   .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-    //   .openPopup();
-
-    map.on('click', function (mapE) {
+    this.#map.on('click', function (mapE) {
       form.classList.remove('hidden');
       inputDistance.focus();
-      mapEvent = mapE;
-
-      // const { lat, lng } = mapEvent.latlng;
-      // L.marker([lat, lng])
-      //   .addTo(map)
-      //   .bindPopup(
-      //     L.popup({
-      //       maxWidth: 250,
-      //       minWidth: 100,
-      //       autoClose: false,
-      //       closeOnClick: false,
-      //       className: 'running-popup',
-      //     })
-      //   )
-      //   .setPopupContent('workout')
-      //   .openPopup();
+      this.#mapEvent = mapE;
     });
-  },
-  function () {
-    alert('could not getyour position');
   }
-);
+  _showForm() {}
+  _toggleElevationField() {}
+  _newWorkout() {}
+}
+
+const app = new App();
 
 form.addEventListener('submit', function (e) {
   inputDistance.value =

@@ -87,14 +87,44 @@ class App {
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
   }
+
   _newWorkout(e) {
+    const validInputs = (...inputs) =>
+      inputs.every(inp => Number.isFinite(inp));
+
+    e.preventDefault();
+    const type = inputType.value;
+    const distance = +inputDistance.value;
+    const duration = +inputDuration.value;
+
+    if (type === 'running') {
+      const cadance = inputCadence.value;
+      if (
+        !validInputs(distance, duration, cadance)
+        // !Number.isFinite(distance) ||
+        // !Number.isFinite(duration) ||
+        // !Number.isFinite(cadence)
+      )
+        return alert('not a number');
+    }
+
+    if (type === 'cycling') {
+      const elevation = inputElevation.value;
+      if (
+        !validInputs(distance, duration, elevation)
+        // !Number.isFinite(distance) ||
+        // !Number.isFinite(duration) ||
+        // !Number.isFinite(elevation)
+      )
+        return alert('not a number');
+    }
+
     inputDistance.value =
       inputDuration.value =
       inputCadence.value =
       inputElevation.value =
         ' ';
 
-    e.preventDefault();
     const { lat, lng } = this.#mapEvent.latlng;
     L.marker([lat, lng])
       .addTo(this.#map)

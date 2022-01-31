@@ -18,6 +18,7 @@ class Workout {
     this.coords = coords; // {lat , lng}
     this.distance = distance;
     this.duration = duration;
+    const { lat, lng } = this.#mapEvent.latlng;
   }
 }
 
@@ -45,8 +46,12 @@ class Cycling extends Workout {
     this.speed = this.distance / (this.duration / 60);
   }
 }
+//
+//
+//
 
 class App {
+  #workouts = [];
   #map;
   #mapEvent;
   constructor() {
@@ -78,46 +83,54 @@ class App {
 
     this.#map.on('click', this._showForm.bind(this));
   }
+  //
+  //
+
   _showForm(mapE) {
     form.classList.remove('hidden');
     inputDistance.focus();
     this.#mapEvent = mapE;
   }
+  //
+  //
+
   _toggleElevationField() {
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
   }
+  //
+  //
 
   _newWorkout(e) {
     const validInputs = (...inputs) =>
       inputs.every(inp => Number.isFinite(inp));
-
+    const positiveNum = (...inputs) => inputs.every(inp => inp > 0);
     e.preventDefault();
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
 
     if (type === 'running') {
-      const cadance = inputCadence.value;
+      const cadance = +inputCadence.value;
       if (
-        !validInputs(distance, duration, cadance)
-        // !Number.isFinite(distance) ||
-        // !Number.isFinite(duration) ||
-        // !Number.isFinite(cadence)
+        !validInputs(distance, duration, cadance) ||
+        !positiveNum(distance, duration, cadance)
       )
         return alert('not a number');
+      const workout = new Running([lat, lng], distance, duration, elevation);
     }
 
     if (type === 'cycling') {
       const elevation = inputElevation.value;
       if (
-        !validInputs(distance, duration, elevation)
-        // !Number.isFinite(distance) ||
-        // !Number.isFinite(duration) ||
-        // !Number.isFinite(elevation)
+        !validInputs(distance, duration, elevation) ||
+        !positiveNum(distance, duration)
       )
         return alert('not a number');
+      const workout = new Cycling([lat, lng], distance, duration, elevation);
     }
+
+    this.#workouts.push(workout);
 
     inputDistance.value =
       inputDuration.value =
@@ -125,7 +138,6 @@ class App {
       inputElevation.value =
         ' ';
 
-    const { lat, lng } = this.#mapEvent.latlng;
     L.marker([lat, lng])
       .addTo(this.#map)
       .bindPopup(
@@ -140,6 +152,8 @@ class App {
       .setPopupContent('workout')
       .openPopup();
   }
+  //
+  //
 }
 
 const app = new App();

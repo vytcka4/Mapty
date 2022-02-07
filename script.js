@@ -229,7 +229,6 @@ class App {
       .openPopup();
   }
   //
-  ///
 
   _renderWorkout(workout) {
     let html = `
